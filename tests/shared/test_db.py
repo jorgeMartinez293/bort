@@ -1,8 +1,14 @@
 # tests/shared/test_db.py
-import pytest, os, tempfile
+import pytest, os
 os.environ["DB_PATH"] = ":memory:"
 
 from services.shared.db import init_db, get_conn
+from services.shared import db as db_module
+
+@pytest.fixture(autouse=True)
+def fresh_db():
+    db_module.reset_conn()
+    yield
 
 def test_schema_creates_all_tables():
     conn = get_conn()

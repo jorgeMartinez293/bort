@@ -44,6 +44,6 @@ class Upload:
     video_id: int
     platform: str
     status: str   # pending | uploading | done | failed
-    platform_video_id: Optional[str]
-    published_at: Optional[datetime]
-    error_msg: Optional[str]
+    platform_video_id: Optional[str] = None
+    published_at: Optional[datetime] = None
+    error_msg: Optional[str] = None

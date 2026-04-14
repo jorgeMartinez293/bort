@@ -1,13 +1,29 @@
 # services/shared/db.py
 import sqlite3, os
+from typing import Optional
 
 DB_PATH = os.environ.get("DB_PATH", "/data/db/bort.db")
 
+_conn: Optional[sqlite3.Connection] = None
+
 def get_conn() -> sqlite3.Connection:
-    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True) if DB_PATH != ":memory:" else None
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    conn.row_factory = sqlite3.Row
-    return conn
+    global _conn
+    if _conn is None:
+        if DB_PATH != ":memory:":
+            parent = os.path.dirname(DB_PATH)
+            if parent:
+                os.makedirs(parent, exist_ok=True)
+        _conn = sqlite3.connect(DB_PATH, check_same_thread=False)
+        _conn.row_factory = sqlite3.Row
+        _conn.execute("PRAGMA foreign_keys = ON")
+    return _conn
+
+def reset_conn():
+    """For testing only — resets the singleton."""
+    global _conn
+    if _conn is not None:
+        _conn.close()
+    _conn = None
 
 def init_db(conn: sqlite3.Connection) -> None:
     conn.executescript("""
@@ -53,4 +69,3 @@ def init_db(conn: sqlite3.Connection) -> None:
             error_msg TEXT
         );
     """)
-    conn.commit()
