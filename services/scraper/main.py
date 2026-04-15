@@ -36,9 +36,7 @@ def run_scrape():
             subreddit=sub,
             limit=25,
             seen_ids=seen,
-            client_id=os.environ["REDDIT_CLIENT_ID"],
-            client_secret=os.environ["REDDIT_CLIENT_SECRET"],
-            user_agent=os.environ["REDDIT_USER_AGENT"],
+            user_agent=os.environ.get("REDDIT_USER_AGENT", "bort/0.1"),
         )
         for post in posts:
             cur = conn.execute(
@@ -47,6 +45,7 @@ def run_scrape():
                 (BOT_ID, post["reddit_id"], post["subreddit"], post["raw_title"], post["cleaned_script"], post["upvotes"])
             )
             conn.commit()
+            assert cur.lastrowid is not None
             enqueue_tts(q, content_id=cur.lastrowid)
             seen.add(post["reddit_id"])
             total += 1
