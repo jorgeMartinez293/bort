@@ -1,0 +1,25 @@
+# docker-compose.prod.yml — overlay for RPi5 production
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  video-worker:
+    environment:
+      VIDEO_ENCODER: h264_v4l2m2m
+    devices:
+      - /dev/video0:/dev/video0
+      - /dev/video1:/dev/video1
+
+  api:
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --workers 2
+
+  ui:
+    # In prod, UI is served by nginx (built into the image) — disable the dev server
+    profiles: ["dev-only"]
+
+  nginx:
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - /var/lib/tailscale/certs:/certs:ro
+      - ./nginx/nginx-prod.conf:/etc/nginx/nginx.conf:ro
