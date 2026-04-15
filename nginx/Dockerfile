@@ -1,7 +1,7 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 COPY dashboard/package*.json ./
-RUN npm ci
+RUN npm install --legacy-peer-deps
 COPY dashboard/ .
 RUN npm run build
 
