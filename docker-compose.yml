@@ -95,4 +95,4 @@ services:
       dockerfile: nginx/Dockerfile
     ports:
       - "80:80"
-    depends_on: [api, ui]
+    depends_on: [api]
