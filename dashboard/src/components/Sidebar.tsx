@@ -34,6 +34,7 @@ export function Sidebar() {
   return (
     <nav style={{
       width: 200,
+      height: '100vh',
       flexShrink: 0,
       display: 'flex',
       flexDirection: 'column',
@@ -42,6 +43,8 @@ export function Sidebar() {
       backdropFilter: 'blur(16px)',
       WebkitBackdropFilter: 'blur(16px)',
       borderRight: '1px solid rgba(255,255,255,0.08)',
+      position: 'sticky',
+      top: 0,
     }}>
       {/* Logo */}
       <div style={{

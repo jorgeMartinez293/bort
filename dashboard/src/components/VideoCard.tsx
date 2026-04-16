@@ -74,18 +74,10 @@ export function VideoCard({ video, onAction }: Props) {
             fontSize: '0.82rem',
             fontWeight: 500,
             color: 'var(--text)',
-            marginBottom: '0.2rem',
+            marginBottom: '0.35rem',
             lineHeight: 1.45,
           }}>
-            {video.raw_title}
-          </div>
-          <div style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.65rem',
-            color: 'var(--violet-light)',
-            marginBottom: '0.35rem',
-          }}>
-            yt: {video.youtube_title}
+            {video.youtube_title}
           </div>
           <div style={{
             fontFamily: 'var(--font-mono)',
