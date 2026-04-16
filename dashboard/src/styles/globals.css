@@ -1,31 +1,50 @@
 /* dashboard/src/styles/globals.css */
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600;700&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #07080f; --bg2: #0c0e1a; --bg3: #11142b;
-  --border: #1c2040; --border2: #252850;
-  --text: #e8eaf6; --muted: #5a5f88;
-  --accent: #4f7ef7; --accent2: #00c9a7;
-  --warn: #e8a020; --danger: #e8404a;
-  --font-main: 'DM Sans', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --font-disp: 'Syne', sans-serif;
+  /* Glass surfaces */
+  --glass-bg:            rgba(255,255,255,0.06);
+  --glass-bg-hover:      rgba(139,92,246,0.08);
+  --glass-bg-active:     rgba(139,92,246,0.18);
+  --glass-border:        rgba(255,255,255,0.10);
+  --glass-border-active: rgba(139,92,246,0.30);
+  --glass-blur:          20px;
+  --glass-blur-sm:       12px;
+
+  /* Palette */
+  --violet:       #8b5cf6;
+  --violet-light: #a78bfa;
+  --violet-glow:  rgba(139,92,246,0.40);
+  --emerald:      #6ee7b7;
+  --rose:         #fca5a5;
+  --amber:        #fbbf24;
+  --text:         rgba(255,255,255,0.90);
+  --text-muted:   rgba(255,255,255,0.35);
+
+  /* Typography */
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'Fira Code', monospace;
 }
 
 body {
-  background: var(--bg);
+  background:
+    radial-gradient(ellipse 80% 60% at 70% 30%, rgba(139,92,246,0.35) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 20% 80%,  rgba(99,102,241,0.25)  0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 90% 90%,  rgba(168,85,247,0.20)  0%, transparent 50%),
+    #0f0a1e;
+  background-attachment: fixed;
   color: var(--text);
-  font-family: var(--font-main);
+  font-family: var(--font-body);
   min-height: 100vh;
 }
 
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.3); border-radius: 2px; }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  50%       { opacity: 0.4; }
 }
