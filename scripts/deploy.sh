@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-RPI_HOST="${RPI_HOST:-bort@100.91.82.40}"
+RPI_HOST="${RPI_HOST:-jorge@100.91.82.40}"
 RPI_DIR="${RPI_DIR:-~/bort}"
 COMPOSE="docker compose -f docker-compose.yml -f docker-compose.prod.yml"
 
