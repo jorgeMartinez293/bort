@@ -34,17 +34,15 @@ export function Sidebar() {
   return (
     <nav style={{
       width: 200,
-      height: '100vh',
+      alignSelf: 'stretch',
       flexShrink: 0,
       display: 'flex',
       flexDirection: 'column',
-      padding: '1.5rem 1rem',
+      padding: '1.5rem 0.75rem',
       background: 'rgba(255,255,255,0.04)',
       backdropFilter: 'blur(16px)',
       WebkitBackdropFilter: 'blur(16px)',
       borderRight: '1px solid rgba(255,255,255,0.08)',
-      position: 'sticky',
-      top: 0,
     }}>
       {/* Logo */}
       <div style={{
@@ -54,7 +52,6 @@ export function Sidebar() {
         letterSpacing: '-0.03em',
         color: 'var(--violet-light)',
         marginBottom: '2rem',
-        paddingLeft: '0.25rem',
       }}>
         bort
       </div>
