@@ -14,7 +14,7 @@ services:
     volumes:
       - ./services:/app/services
       - ./data:/data
-      - ./media:/media
+      - ${MEDIA_HOST_PATH:-./media}:/media
     depends_on: [redis]
     command: python -m services.scraper.main
 
@@ -27,7 +27,7 @@ services:
       - ./services:/app/services
       - ./scripts:/app/scripts
       - ./data:/data
-      - ./media:/media
+      - ${MEDIA_HOST_PATH:-./media}:/media
     depends_on: [redis]
     command: python -m services.tts.main
 
@@ -39,7 +39,7 @@ services:
     volumes:
       - ./services:/app/services
       - ./data:/data
-      - ./media:/media
+      - ${MEDIA_HOST_PATH:-./media}:/media
     depends_on: [redis]
     command: python -m services.video.main
 
@@ -51,7 +51,7 @@ services:
     volumes:
       - ./services:/app/services
       - ./data:/data
-      - ./media:/media
+      - ${MEDIA_HOST_PATH:-./media}:/media
     depends_on: [redis]
     command: python -m services.upload.main
 
@@ -74,7 +74,7 @@ services:
     volumes:
       - ./services:/app/services
       - ./data:/data
-      - ./media:/media
+      - ${MEDIA_HOST_PATH:-./media}:/media
     depends_on: [redis]
     ports:
       - "8000:8000"
