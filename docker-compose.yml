@@ -25,6 +25,7 @@ services:
       PYTHONPATH: /app
     volumes:
       - ./services:/app/services
+      - ./scripts:/app/scripts
       - ./data:/data
       - ./media:/media
     depends_on: [redis]
@@ -41,6 +42,29 @@ services:
       - ./media:/media
     depends_on: [redis]
     command: python -m services.video.main
+
+  upload-worker:
+    build: ./services/upload
+    env_file: .env
+    environment:
+      PYTHONPATH: /app
+    volumes:
+      - ./services:/app/services
+      - ./data:/data
+      - ./media:/media
+    depends_on: [redis]
+    command: python -m services.upload.main
+
+  scheduler:
+    build: ./services/scheduler
+    env_file: .env
+    environment:
+      PYTHONPATH: /app
+    volumes:
+      - ./services:/app/services
+      - ./data:/data
+    depends_on: [redis, api]
+    command: python -m services.scheduler.main
 
   api:
     build: ./services/api

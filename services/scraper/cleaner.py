@@ -23,8 +23,16 @@ def clean_til(raw_title: str) -> str:
     words = text.split()
     if len(words) > MAX_WORDS:
         text = " ".join(words[:MAX_WORDS]) + "."
-    # Add hook
-    return f"Did you know that {text[0].lower()}{text[1:]}"
+    # Add hook as a separate question — the sentence boundary creates a natural TTS pause
+    return f"Did you know? {text}"
+
+
+def format_youtube_title(raw_title: str) -> str:
+    """Strip TIL prefix variants and capitalize the first letter for YouTube titles."""
+    text = re.sub(r"^TIL[,:]?\s+(?:that\b\s*)?", "", raw_title, flags=re.IGNORECASE).strip()
+    if not text:
+        return raw_title
+    return text[0].upper() + text[1:]
 
 
 def is_suitable(upvotes: int, reddit_id: str, seen_ids: set) -> bool:

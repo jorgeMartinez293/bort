@@ -3,10 +3,18 @@ import { useEffect, useState } from 'react'
 import type { Bot } from '../api/client'
 import { fetchBots, updateBotYouTube } from '../api/client'
 
+const SCHEDULE_OPTIONS: { value: Bot['upload_schedule']; label: string }[] = [
+  { value: 'manual',   label: 'Never (manual only)' },
+  { value: 'hourly',   label: 'Every hour' },
+  { value: 'every_6h', label: 'Every 6 hours' },
+  { value: 'daily',    label: 'Every day' },
+]
+
 interface BotDraft {
   description: string
   tagsRaw: string
   privacy: 'private' | 'public'
+  upload_schedule: Bot['upload_schedule']
 }
 
 interface SaveState {
@@ -77,6 +85,7 @@ export function Settings() {
           description: b.yt_description || '',
           tagsRaw: parseTags(b.yt_tags),
           privacy: (b.yt_privacy as 'private' | 'public') || 'private',
+          upload_schedule: b.upload_schedule || 'manual',
         }
       })
       setDrafts(initial)
@@ -98,6 +107,7 @@ export function Settings() {
         yt_description: draft.description,
         yt_tags: tags,
         yt_privacy: draft.privacy,
+        upload_schedule: draft.upload_schedule,
       })
       setSaveState(prev => ({ ...prev, [bot.id]: { saving: false, saved: true, error: null } }))
       setTimeout(() => {
@@ -252,6 +262,34 @@ export function Settings() {
                       </button>
                     ))}
                   </div>
+                </div>
+
+                {/* Upload schedule */}
+                <div>
+                  <label style={labelStyle}>Upload schedule</label>
+                  <select
+                    value={draft.upload_schedule}
+                    onChange={e => updateDraft(bot.id, { upload_schedule: e.target.value as Bot['upload_schedule'] })}
+                    style={{
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(255,255,255,0.10)',
+                      borderRadius: 8,
+                      color: 'var(--text)',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: '0.82rem',
+                      padding: '0.5rem 0.75rem',
+                      outline: 'none',
+                      cursor: 'pointer',
+                      width: '100%',
+                    }}
+                  >
+                    {SCHEDULE_OPTIONS.map(opt => (
+                      <option key={opt.value} value={opt.value}
+                        style={{ background: '#1a1025', color: 'var(--text)' }}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* Save */}

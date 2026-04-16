@@ -10,7 +10,7 @@ def format_ass_time(seconds: float) -> str:
     s = seconds % 60
     return f"{h}:{m:02d}:{s:05.2f}"
 
-ASS_HEADER = """\
+_ASS_HEADER_TMPL = """\
 [Script Info]
 ScriptType: v4.00+
 PlayResX: 1080
@@ -19,22 +19,34 @@ WrapStyle: 0
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Syne,72,&H00FFFFFF,&H000000FF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,4,0,2,50,50,200,1
+{style_line}
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
 
-def timestamps_to_ass(words: list[dict], words_per_chunk: int = 3) -> str:
+# Alignment 5 = center-center (default, no image)
+_STYLE_CENTER = "Style: Default,Syne,88,&H00FFFFFF,&H000000FF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,4,0,5,50,50,0,1"
+
+def _ass_header(subtitle_top_y: int = 0) -> str:
+    if subtitle_top_y > 0:
+        # Alignment 8 = top-center; MarginV = pixels from top edge → text starts right below image
+        style = f"Style: Default,Syne,80,&H00FFFFFF,&H000000FF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,4,0,8,60,60,{subtitle_top_y},1"
+    else:
+        style = _STYLE_CENTER
+    return _ASS_HEADER_TMPL.format(style_line=style)
+
+def timestamps_to_ass(words: list[dict], words_per_chunk: int = 3, with_image: bool = False, subtitle_top_y: int = 0) -> str:
     """
     Convert word timestamps to ASS subtitle format.
     Groups words into chunks of words_per_chunk.
     Within each chunk, the currently-speaking word is highlighted in amber.
     """
+    header = _ass_header(subtitle_top_y)
     if not words:
-        return ASS_HEADER
+        return header
 
-    lines = [ASS_HEADER]
+    lines = [header]
 
     # Group into chunks
     chunks = [words[i:i+words_per_chunk] for i in range(0, len(words), words_per_chunk)]

@@ -3,7 +3,7 @@ from services.scraper.cleaner import clean_til, is_suitable
 def test_strips_til_prefix():
     result = clean_til("TIL that honey never expires.")
     assert not result.startswith("TIL")
-    assert "honey never expires" in result
+    assert "honey never expires" in result.lower()
 
 def test_strips_til_without_that():
     result = clean_til("TIL honey bees can recognize human faces.")

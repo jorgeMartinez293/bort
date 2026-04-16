@@ -32,3 +32,11 @@ def enqueue_render(q: rq.Queue, content_id: int) -> rq.job.Job:
         job_id=f"render-{content_id}",
         job_timeout=600,
     )
+
+def enqueue_upload(q: rq.Queue, video_id: int) -> rq.job.Job:
+    return q.enqueue(
+        "services.upload.main.process_upload",
+        kwargs={"video_id": video_id},
+        job_id=f"upload-{video_id}",
+        job_timeout=600,
+    )

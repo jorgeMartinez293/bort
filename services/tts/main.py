@@ -9,8 +9,9 @@ from services.tts.whisper_timestamps import get_word_timestamps
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [tts] %(message)s")
 log = logging.getLogger(__name__)
 
-MEDIA_PATH = os.environ.get("MEDIA_PATH", "/media")
-MODEL_PATH = os.environ.get("PIPER_MODEL_PATH", "/media/tts_models/en_US-lessac-medium.onnx")
+MEDIA_PATH    = os.environ.get("MEDIA_PATH", "/media")
+MODEL_PATH    = os.environ.get("PIPER_MODEL_PATH", "/media/tts_models/en_US-ryan-medium.onnx")
+LENGTH_SCALE  = float(os.environ.get("PIPER_LENGTH_SCALE", "1.2"))
 
 def process_content(content_id: int):
     conn = get_conn()
@@ -26,7 +27,7 @@ def process_content(content_id: int):
     ts_path = os.path.join(audio_dir, f"{content_id}_timestamps.json")
 
     try:
-        synthesize(row["cleaned_script"], wav_path, MODEL_PATH)
+        synthesize(row["cleaned_script"], wav_path, MODEL_PATH, length_scale=LENGTH_SCALE)
         log.info(f"TTS done for content {content_id}")
         timestamps = get_word_timestamps(wav_path)
         with open(ts_path, "w") as f:

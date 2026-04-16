@@ -1,6 +1,27 @@
 // dashboard/src/api/client.ts
 const BASE = '/api'
 
+export interface Bot {
+  id: number
+  name: string
+  niche: string
+  subreddits: string   // JSON string
+  platforms: string    // JSON string
+  schedule_cron: string
+  background_mode: string
+  active: number
+  created_at: string
+  yt_description: string
+  yt_tags: string      // JSON string e.g. '["tag1","tag2"]'
+  yt_privacy: string   // 'private' | 'public'
+  upload_schedule: 'manual' | 'hourly' | 'every_6h' | 'daily'
+}
+
+export interface QueuedVideo extends Video {
+  bot_name: string
+  queue_position: number
+}
+
 export interface Video {
   id: number
   content_id: number
@@ -9,6 +30,8 @@ export interface Video {
   duration_secs: number
   status: string
   created_at: string
+  raw_title: string
+  youtube_title: string
   cleaned_script: string
   subreddit: string
   upvotes: number
@@ -32,6 +55,40 @@ export async function updateVideoStatus(id: number, status: string): Promise<voi
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status }),
   })
+}
+
+export async function fetchBots(): Promise<Bot[]> {
+  const res = await fetch(`${BASE}/bots`)
+  if (!res.ok) throw new Error('Failed to fetch bots')
+  return res.json()
+}
+
+export async function updateBotYouTube(
+  id: number,
+  config: { yt_description?: string; yt_tags?: string[]; yt_privacy?: string; upload_schedule?: string }
+): Promise<void> {
+  const res = await fetch(`${BASE}/bots/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(config),
+  })
+  if (!res.ok) throw new Error('Failed to update bot')
+}
+
+export async function fetchQueue(): Promise<QueuedVideo[]> {
+  const res = await fetch(`${BASE}/queue`)
+  if (!res.ok) throw new Error('Failed to fetch queue')
+  return res.json()
+}
+
+export async function triggerUpload(videoId: number): Promise<void> {
+  const res = await fetch(`${BASE}/queue/${videoId}/trigger`, { method: 'POST' })
+  if (!res.ok) throw new Error('Failed to trigger upload')
+}
+
+export async function dequeueVideo(videoId: number): Promise<void> {
+  const res = await fetch(`${BASE}/queue/${videoId}/dequeue`, { method: 'POST' })
+  if (!res.ok) throw new Error('Failed to dequeue video')
 }
 
 export async function fetchSystemStatus(): Promise<SystemStatus> {

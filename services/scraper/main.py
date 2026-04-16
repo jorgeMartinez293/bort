@@ -40,9 +40,9 @@ def run_scrape():
         )
         for post in posts:
             cur = conn.execute(
-                "INSERT INTO content (bot_id, reddit_id, subreddit, raw_title, cleaned_script, upvotes, status) "
-                "VALUES (?,?,?,?,?,?,'pending')",
-                (BOT_ID, post["reddit_id"], post["subreddit"], post["raw_title"], post["cleaned_script"], post["upvotes"])
+                "INSERT INTO content (bot_id, reddit_id, subreddit, raw_title, cleaned_script, upvotes, status, image_url) "
+                "VALUES (?,?,?,?,?,?,'pending',?)",
+                (BOT_ID, post["reddit_id"], post["subreddit"], post["raw_title"], post["cleaned_script"], post["upvotes"], post.get("image_url"))
             )
             conn.commit()
             assert cur.lastrowid is not None

@@ -69,3 +69,16 @@ def init_db(conn: sqlite3.Connection) -> None:
             error_msg TEXT
         );
     """)
+    # Schema migrations — safe to run multiple times (ignored if column exists)
+    for sql in [
+        "ALTER TABLE bots ADD COLUMN yt_description TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE bots ADD COLUMN yt_tags TEXT NOT NULL DEFAULT '[]'",
+        "ALTER TABLE bots ADD COLUMN yt_privacy TEXT NOT NULL DEFAULT 'private'",
+        "ALTER TABLE bots ADD COLUMN upload_schedule TEXT NOT NULL DEFAULT 'manual'",
+        "ALTER TABLE content ADD COLUMN image_url TEXT",
+    ]:
+        try:
+            conn.execute(sql)
+        except Exception:
+            pass
+    conn.commit()

@@ -5,7 +5,8 @@ import { fetchBots } from '../api/client'
 import type { Bot } from '../api/client'
 
 const NAV = [
-  { to: '/',          label: 'Queue' },
+  { to: '/',          label: 'Review' },
+  { to: '/queue',     label: 'Queue' },
   { to: '/published', label: 'Published' },
   { to: '/rejected',  label: 'Rejected' },
   { to: '/settings',  label: 'Settings' },

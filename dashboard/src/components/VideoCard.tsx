@@ -51,20 +51,37 @@ export function VideoCard({ video, onAction }: Props) {
             background: 'rgba(139,92,246,0.12)',
             border: '1px solid rgba(139,92,246,0.2)',
             borderRadius: 8,
+            overflow: 'hidden',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
+            position: 'relative',
           }}
         >
+          <img
+            src={`/api/videos/${video.id}/thumbnail`}
+            alt=""
+            onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              borderRadius: 8,
+            }}
+          />
           <div style={{
+            position: 'relative',
             width: 0,
             height: 0,
-            borderLeft: '14px solid var(--violet-light)',
+            borderLeft: '14px solid white',
             borderTop: '8px solid transparent',
             borderBottom: '8px solid transparent',
             marginLeft: 3,
-            opacity: 0.7,
+            opacity: 0.85,
+            filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.6))',
           }} />
         </div>
 
