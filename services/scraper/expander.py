@@ -87,20 +87,19 @@ def _pick_template(script: str) -> str:
 # Optional Gemini path (free tier: gemini-flash, 15 RPM, 1 M tokens/day)
 # ---------------------------------------------------------------------------
 _gemini_client = None
-_gemini_ready = False
 
 
 def _get_gemini():
-    global _gemini_client, _gemini_ready
-    if not _gemini_ready:
-        _gemini_ready = True
-        if not os.environ.get("GEMINI_API_KEY"):
-            return None
-        try:
-            from google import genai  # type: ignore[import]
-            _gemini_client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
-        except Exception as e:
-            log.warning(f"Could not initialise Gemini client: {e}")
+    global _gemini_client
+    if _gemini_client is not None:
+        return _gemini_client
+    if not os.environ.get("GEMINI_API_KEY"):
+        return None
+    try:
+        from google import genai  # type: ignore[import]
+        _gemini_client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    except Exception as e:
+        log.warning(f"Could not initialise Gemini client: {e}")
     return _gemini_client
 
 

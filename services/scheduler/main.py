@@ -30,7 +30,7 @@ def _parse_ts(ts: str) -> datetime.datetime:
 def retry_expand(conn, q) -> None:
     """Try to expand all expand_pending content. Stops on first Gemini failure."""
     rows = conn.execute(
-        "SELECT id, cleaned_script FROM content WHERE status='expand_pending'"
+        "SELECT id, cleaned_script FROM content WHERE status='expand_pending' ORDER BY id ASC"
     ).fetchall()
     for row in rows:
         elaboration = gemini_elaborate_or_none(row["cleaned_script"])
