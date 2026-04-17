@@ -41,12 +41,13 @@ def run_scrape():
         for post in posts:
             cur = conn.execute(
                 "INSERT INTO content (bot_id, reddit_id, subreddit, raw_title, cleaned_script, upvotes, status, image_url) "
-                "VALUES (?,?,?,?,?,?,'pending',?)",
-                (BOT_ID, post["reddit_id"], post["subreddit"], post["raw_title"], post["cleaned_script"], post["upvotes"], post.get("image_url"))
+                "VALUES (?,?,?,?,?,?,?,?)",
+                (BOT_ID, post["reddit_id"], post["subreddit"], post["raw_title"], post["cleaned_script"], post["upvotes"], post["status"], post.get("image_url"))
             )
             conn.commit()
             assert cur.lastrowid is not None
-            enqueue_tts(q, content_id=cur.lastrowid)
+            if post["status"] == "pending":
+                enqueue_tts(q, content_id=cur.lastrowid)
             seen.add(post["reddit_id"])
             total += 1
     log.info(f"Scraped {total} new posts")
