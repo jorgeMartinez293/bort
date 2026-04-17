@@ -101,6 +101,20 @@ export async function fetchSystemStatus(): Promise<SystemStatus> {
   return res.json()
 }
 
+export interface NextUploadInfo {
+  bot_id: number
+  bot_name: string
+  schedule: string
+  seconds_until: number
+  uploading: boolean
+}
+
+export async function fetchNextUpload(): Promise<NextUploadInfo[]> {
+  const res = await fetch(`${BASE}/system/next-upload`)
+  if (!res.ok) throw new Error('Failed to fetch next upload')
+  return res.json()
+}
+
 export async function fetchGeminiStatus(): Promise<GeminiStatus> {
   const res = await fetch(`${BASE}/system/gemini-status`)
   return res.json()

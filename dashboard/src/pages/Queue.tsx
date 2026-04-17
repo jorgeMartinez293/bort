@@ -1,7 +1,78 @@
 // dashboard/src/pages/Queue.tsx
-import { useEffect, useState, useCallback } from 'react'
-import type { QueuedVideo } from '../api/client'
-import { fetchQueue, triggerUpload, dequeueVideo } from '../api/client'
+import { useEffect, useState, useCallback, useRef } from 'react'
+import type { QueuedVideo, NextUploadInfo } from '../api/client'
+import { fetchQueue, triggerUpload, dequeueVideo, fetchNextUpload } from '../api/client'
+
+function fmt(secs: number): string {
+  const h = Math.floor(secs / 3600)
+  const m = Math.floor((secs % 3600) / 60)
+  const s = secs % 60
+  return [h, m, s].map(n => String(n).padStart(2, '0')).join(':')
+}
+
+function UploadCountdown({ info }: { info: NextUploadInfo }) {
+  const [remaining, setRemaining] = useState(info.seconds_until)
+  const ref = useRef(info.seconds_until)
+
+  useEffect(() => {
+    ref.current = info.seconds_until
+    setRemaining(info.seconds_until)
+  }, [info.seconds_until])
+
+  useEffect(() => {
+    if (info.uploading || ref.current === 0) return
+    const id = setInterval(() => {
+      ref.current = Math.max(0, ref.current - 1)
+      setRemaining(ref.current)
+    }, 1000)
+    return () => clearInterval(id)
+  }, [info.uploading])
+
+  const SCHEDULE_LABEL: Record<string, string> = {
+    hourly: '1h', every_6h: '6h', daily: '24h',
+  }
+
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.6rem',
+      padding: '0.45rem 0.75rem',
+      borderRadius: 8,
+      background: 'rgba(255,255,255,0.04)',
+      border: '1px solid rgba(255,255,255,0.08)',
+    }}>
+      <span style={{
+        width: 6, height: 6, borderRadius: '50%', flexShrink: 0,
+        background: info.uploading ? 'var(--emerald)' : remaining === 0 ? '#fbbf24' : 'var(--violet)',
+        animation: info.uploading ? 'pulse 2s ease-in-out infinite' : 'none',
+      }} />
+      <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+        {info.bot_name}
+      </span>
+      <span style={{
+        fontSize: '0.62rem',
+        color: 'var(--text-muted)',
+        background: 'rgba(255,255,255,0.06)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: 4,
+        padding: '0.05rem 0.35rem',
+      }}>
+        {SCHEDULE_LABEL[info.schedule] ?? info.schedule}
+      </span>
+      <span style={{
+        marginLeft: 'auto',
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.82rem',
+        fontWeight: 600,
+        color: info.uploading ? 'var(--emerald)' : remaining === 0 ? '#fbbf24' : 'var(--text)',
+        letterSpacing: '0.04em',
+      }}>
+        {info.uploading ? 'Subiendo…' : remaining === 0 ? 'Listo' : fmt(remaining)}
+      </span>
+    </div>
+  )
+}
 
 function QueueCard({
   video,
@@ -243,6 +314,7 @@ function QueueCard({
 export function Queue() {
   const [videos, setVideos] = useState<QueuedVideo[]>([])
   const [loading, setLoading] = useState(true)
+  const [nextUploads, setNextUploads] = useState<NextUploadInfo[]>([])
 
   const load = useCallback(() => {
     fetchQueue()
@@ -256,6 +328,12 @@ export function Queue() {
     const id = setInterval(load, 10_000)
     return () => clearInterval(id)
   }, [load])
+
+  useEffect(() => {
+    fetchNextUpload().then(setNextUploads).catch(() => {})
+    const id = setInterval(() => fetchNextUpload().then(setNextUploads).catch(() => {}), 60_000)
+    return () => clearInterval(id)
+  }, [])
 
   function removeVideo(id: number) {
     setVideos(prev =>
@@ -283,6 +361,12 @@ export function Queue() {
           </span>
         )}
       </div>
+
+      {nextUploads.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '1.25rem' }}>
+          {nextUploads.map(info => <UploadCountdown key={info.bot_id} info={info} />)}
+        </div>
+      )}
 
       {loading && (
         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Loading…</p>
