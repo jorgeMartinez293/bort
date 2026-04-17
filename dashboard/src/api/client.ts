@@ -43,6 +43,11 @@ export interface SystemStatus {
   counts: { pending_review: number; published_today: number }
 }
 
+export interface GeminiStatus {
+  key_missing: boolean
+  expand_pending_count: number
+}
+
 export async function fetchVideos(status: string): Promise<Video[]> {
   const res = await fetch(`${BASE}/videos?status=${status}`)
   if (!res.ok) throw new Error('Failed to fetch videos')
@@ -93,6 +98,11 @@ export async function dequeueVideo(videoId: number): Promise<void> {
 
 export async function fetchSystemStatus(): Promise<SystemStatus> {
   const res = await fetch(`${BASE}/system/status`)
+  return res.json()
+}
+
+export async function fetchGeminiStatus(): Promise<GeminiStatus> {
+  const res = await fetch(`${BASE}/system/gemini-status`)
   return res.json()
 }
 
