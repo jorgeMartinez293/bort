@@ -1,8 +1,8 @@
 // dashboard/src/components/Sidebar.tsx
 import { useEffect, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { fetchBots } from '../api/client'
-import type { Bot } from '../api/client'
+import { fetchBots, fetchGeminiStatus } from '../api/client'
+import type { Bot, GeminiStatus } from '../api/client'
 
 const NAV = [
   { to: '/',          label: 'Review' },
@@ -15,10 +15,20 @@ const NAV = [
 export function Sidebar() {
   const [bots, setBots] = useState<Bot[]>([])
   const [open, setOpen] = useState(false)
+  const [gemini, setGemini] = useState<GeminiStatus>({ key_missing: false, expand_pending_count: 0 })
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     fetchBots().then(setBots).catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    function poll() {
+      fetchGeminiStatus().then(setGemini).catch(() => {})
+    }
+    poll()
+    const id = setInterval(poll, 30_000)
+    return () => clearInterval(id)
   }, [])
 
   useEffect(() => {
@@ -52,10 +62,26 @@ export function Sidebar() {
         fontSize: '1.2rem',
         letterSpacing: '-0.03em',
         color: 'var(--violet-light)',
-        marginBottom: '2rem',
+        marginBottom: '1.25rem',
       }}>
         bort
       </div>
+
+      {/* Gemini warning — only when API key is missing */}
+      {gemini.key_missing && (
+        <div style={{
+          marginBottom: '1rem',
+          padding: '0.45rem 0.6rem',
+          borderRadius: 7,
+          background: 'rgba(251,191,36,0.08)',
+          border: '1px solid rgba(251,191,36,0.25)',
+          fontSize: '0.72rem',
+          color: '#fbbf24',
+          lineHeight: 1.4,
+        }}>
+          ⚠ Gemini API key not configured
+        </div>
+      )}
 
       {/* Nav pills */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
@@ -92,11 +118,46 @@ export function Sidebar() {
                   opacity: isActive ? 1 : 0,
                   transition: 'opacity 0.18s',
                 }} />
-                {label}
+                <span style={{ flex: 1 }}>{label}</span>
               </>
             )}
           </NavLink>
         ))}
+
+        {/* Waiting pill — visible whenever expand_pending_count > 0 */}
+        {gemini.expand_pending_count > 0 && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.55rem 0.75rem',
+            borderRadius: 8,
+            fontSize: '0.82rem',
+            fontWeight: 500,
+            color: 'var(--text-muted)',
+            border: '1px solid transparent',
+          }}>
+            <span style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              background: 'transparent',
+              flexShrink: 0,
+            }} />
+            <span style={{ flex: 1 }}>Waiting</span>
+            <span style={{
+              fontSize: '0.68rem',
+              fontWeight: 600,
+              padding: '0.1rem 0.4rem',
+              borderRadius: 10,
+              background: 'rgba(251,191,36,0.15)',
+              color: '#fbbf24',
+              border: '1px solid rgba(251,191,36,0.3)',
+            }}>
+              {gemini.expand_pending_count}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Spacer */}
