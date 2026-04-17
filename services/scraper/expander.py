@@ -153,3 +153,13 @@ def expand_script(script: str) -> str:
     if base and base[-1] not in ".!?":
         base += "."
     return f"{base} {elaboration}"
+
+
+def gemini_available() -> bool:
+    """True if GEMINI_API_KEY is set in the environment."""
+    return bool(os.environ.get("GEMINI_API_KEY"))
+
+
+def gemini_elaborate_or_none(script: str) -> Optional[str]:
+    """Return a Gemini elaboration or None if unavailable/quota exceeded."""
+    return _gemini_elaborate(script)
