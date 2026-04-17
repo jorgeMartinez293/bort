@@ -1,8 +1,7 @@
-# services/scraper/reddit.py
 import os
 import requests
 from services.scraper.cleaner import clean_til, is_suitable
-from services.scraper.expander import expand_script
+from services.scraper.expander import gemini_elaborate_or_none, TARGET_WORD_COUNT
 
 _IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp"}
 
@@ -38,12 +37,30 @@ def fetch_posts(
             continue
         if not is_suitable(post["score"], post["id"], seen_ids):
             continue
+
+        script = clean_til(post["title"])
+        if len(script.split()) >= TARGET_WORD_COUNT:
+            cleaned_script = script
+            status = "pending"
+        else:
+            elaboration = gemini_elaborate_or_none(script)
+            if elaboration:
+                base = script.rstrip()
+                if base and base[-1] not in ".!?":
+                    base += "."
+                cleaned_script = f"{base} {elaboration}"
+                status = "pending"
+            else:
+                cleaned_script = script
+                status = "expand_pending"
+
         results.append({
             "reddit_id": post["id"],
             "subreddit": post["subreddit"],
             "raw_title": post["title"],
-            "cleaned_script": expand_script(clean_til(post["title"])),
+            "cleaned_script": cleaned_script,
             "upvotes": post["score"],
             "image_url": _extract_image_url(post),
+            "status": status,
         })
     return results
