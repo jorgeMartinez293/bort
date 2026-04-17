@@ -15,7 +15,9 @@ def system_status():
         "queues": {
             "tts":    redis.llen("rq:queue:tts"),
             "render": redis.llen("rq:queue:render"),
-            "upload": redis.llen("rq:queue:upload"),
+            "upload": conn.execute(
+                "SELECT COUNT(*) FROM videos WHERE status='approved'"
+            ).fetchone()[0],
         },
         "counts": {
             "pending_review": conn.execute(
