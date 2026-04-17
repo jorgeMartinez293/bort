@@ -106,13 +106,13 @@ GET /api/system/gemini-status
 
 ### Dashboard
 
-- Nav pills (Queue, Review, Today) each show a count badge when > 0. Add a **Gemini** nav item (or section) that shows `expand_pending_count` as a pill whenever > 0.
+- The existing nav row (Queue, Review, Today) gets a **fourth pill** labelled "Waiting" showing `expand_pending_count` when > 0.
 - Permanent warning banner visible only when `key_missing = true`: `"⚠ Gemini API key not configured — N videos waiting"`.
 - Poll `/api/system/gemini-status` at the same interval as the existing system health polling.
 
 ## What does NOT change
 
-- `expand_script` with template fallback is kept intact for `scripts/regenerate.py` — only removed from the scraper pipeline.
+- `expand_script` with template fallback is kept intact for `scripts/regenerate.py` — only removed from the scraper pipeline. `regenerate.py` itself should be updated to use `gemini_elaborate_or_none` and skip content that can't be expanded (same new behavior), but this is a secondary task handled separately.
 - `services/tts/main.py` — no changes.
 - `services/video/main.py` — no changes.
 - All existing tests pass without modification.
