@@ -107,7 +107,7 @@ GET /api/system/gemini-status
 ### Dashboard
 
 - The existing nav row (Queue, Review, Today) gets a **fourth pill** labelled "Waiting" showing `expand_pending_count` when > 0.
-- Permanent warning banner visible only when `key_missing = true`: `"⚠ Gemini API key not configured — N videos waiting"`.
+- Permanent warning banner visible only when `key_missing = true`: `"⚠ Gemini API key not configured"`.
 - Poll `/api/system/gemini-status` at the same interval as the existing system health polling.
 
 ## What does NOT change
