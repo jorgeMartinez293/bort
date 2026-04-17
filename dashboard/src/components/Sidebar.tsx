@@ -124,40 +124,6 @@ export function Sidebar() {
           </NavLink>
         ))}
 
-        {/* Waiting pill — visible whenever expand_pending_count > 0 */}
-        {gemini.expand_pending_count > 0 && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            padding: '0.55rem 0.75rem',
-            borderRadius: 8,
-            fontSize: '0.82rem',
-            fontWeight: 500,
-            color: 'var(--text-muted)',
-            border: '1px solid transparent',
-          }}>
-            <span style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              background: 'transparent',
-              flexShrink: 0,
-            }} />
-            <span style={{ flex: 1 }}>Waiting</span>
-            <span style={{
-              fontSize: '0.68rem',
-              fontWeight: 600,
-              padding: '0.1rem 0.4rem',
-              borderRadius: 10,
-              background: 'rgba(251,191,36,0.15)',
-              color: '#fbbf24',
-              border: '1px solid rgba(251,191,36,0.3)',
-            }}>
-              {gemini.expand_pending_count}
-            </span>
-          </div>
-        )}
       </div>
 
       {/* Spacer */}
