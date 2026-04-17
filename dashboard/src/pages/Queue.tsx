@@ -85,6 +85,7 @@ function QueueCard({
   const [hovered, setHovered] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [dequeuing, setDequeuing] = useState(false)
+  const [expanded, setExpanded] = useState(false)
 
   const age = () => {
     const diff = Date.now() - new Date(video.created_at).getTime()
@@ -107,10 +108,15 @@ function QueueCard({
     setDequeuing(true)
     try {
       await dequeueVideo(video.id)
-      onUpload(video.id)  // removes from queue list
+      onUpload(video.id)
     } catch {
       setDequeuing(false)
     }
+  }
+
+  function handleToggle() {
+    if (expanded) setPreviewing(false)
+    setExpanded(v => !v)
   }
 
   return (
@@ -119,109 +125,60 @@ function QueueCard({
       onMouseLeave={() => setHovered(false)}
       style={{
         position: 'relative',
-        background: hovered ? 'var(--glass-bg-hover)' : 'var(--glass-bg)',
+        background: expanded
+          ? 'rgba(139,92,246,0.07)'
+          : hovered ? 'var(--glass-bg-hover)' : 'var(--glass-bg)',
         backdropFilter: 'blur(var(--glass-blur))',
         WebkitBackdropFilter: 'blur(var(--glass-blur))',
-        border: `1px solid ${hovered ? 'rgba(139,92,246,0.25)' : 'var(--glass-border)'}`,
-        borderRadius: 12,
-        overflow: 'hidden',
-        marginBottom: '0.75rem',
+        border: `1px solid ${expanded || hovered ? 'rgba(139,92,246,0.25)' : 'var(--glass-border)'}`,
+        borderRadius: 12, overflow: 'hidden', marginBottom: '0.75rem',
         transition: 'background 0.2s, border-color 0.2s',
       }}
     >
-      <div style={{
-        height: 1,
-        background: 'linear-gradient(90deg, transparent, var(--violet-glow), transparent)',
-      }} />
+      <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, var(--violet-glow), transparent)' }} />
 
-      <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', padding: '1rem' }}>
-        {/* Position badge */}
-        <div style={{
-          width: 54,
-          height: 96,
-          flexShrink: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '0.5rem',
-        }}>
-          <div
-            onClick={() => setPreviewing(v => !v)}
-            style={{
-              width: 40,
-              height: 40,
-              background: 'rgba(139,92,246,0.12)',
-              border: '1px solid rgba(139,92,246,0.2)',
-              borderRadius: 8,
-              overflow: 'hidden',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              position: 'relative',
-              flexShrink: 0,
-            }}
-          >
+      {/* Header row — tap to expand */}
+      <div
+        onClick={handleToggle}
+        style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '0.85rem 1rem', cursor: 'pointer' }}
+      >
+        {/* Position badge + thumb */}
+        <div style={{ width: 54, height: 96, flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+          <div style={{
+            width: 40, height: 40,
+            background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.2)',
+            borderRadius: 8, overflow: 'hidden',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            position: 'relative', flexShrink: 0,
+          }}>
             <img
               src={`/api/videos/${video.id}/thumbnail`}
               alt=""
               onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                borderRadius: 8,
-              }}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8 }}
             />
             <div style={{
-              position: 'relative',
-              width: 0,
-              height: 0,
-              borderLeft: '10px solid white',
-              borderTop: '6px solid transparent',
-              borderBottom: '6px solid transparent',
-              marginLeft: 2,
-              opacity: 0.85,
-              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.6))',
+              position: 'relative', width: 0, height: 0,
+              borderLeft: '10px solid white', borderTop: '6px solid transparent', borderBottom: '6px solid transparent',
+              marginLeft: 2, opacity: 0.85, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.6))',
             }} />
           </div>
           <span style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.7rem',
-            fontWeight: 600,
-            color: 'var(--violet-light)',
-            background: 'rgba(139,92,246,0.15)',
-            border: '1px solid rgba(139,92,246,0.3)',
-            borderRadius: 999,
-            padding: '0.1rem 0.5rem',
-            lineHeight: 1.6,
-          }}>
-            #{video.queue_position}
-          </span>
+            fontFamily: 'var(--font-mono)', fontSize: '0.7rem', fontWeight: 600,
+            color: 'var(--violet-light)', background: 'rgba(139,92,246,0.15)',
+            border: '1px solid rgba(139,92,246,0.3)', borderRadius: 999,
+            padding: '0.1rem 0.5rem', lineHeight: 1.6,
+          }}>#{video.queue_position}</span>
         </div>
 
-        {/* Content */}
-        <div style={{ flex: 1 }}>
-          <div style={{
-            fontSize: '0.82rem',
-            fontWeight: 500,
-            color: 'var(--text)',
-            marginBottom: '0.35rem',
-            lineHeight: 1.45,
-          }}>
+        {/* Title + meta */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: '0.82rem', fontWeight: 500, color: 'var(--text)', marginBottom: '0.35rem', lineHeight: 1.45 }}>
             {video.youtube_title}
           </div>
           <div style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.62rem',
-            color: 'var(--text-muted)',
-            display: 'flex',
-            gap: '0.75rem',
-            flexWrap: 'wrap',
-            marginBottom: '0.65rem',
+            fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)',
+            display: 'flex', gap: '0.75rem', flexWrap: 'wrap',
           }}>
             <span style={{ color: 'var(--violet-light)' }}>{video.bot_name}</span>
             <span>·</span>
@@ -233,80 +190,62 @@ function QueueCard({
             <span>·</span>
             <span>{age()}</span>
           </div>
+        </div>
 
+        {/* Chevron */}
+        <span style={{
+          fontSize: '0.7rem', color: 'var(--text-muted)', flexShrink: 0, opacity: 0.6,
+          transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s',
+        }}>▾</span>
+      </div>
+
+      {/* Expanded area */}
+      {expanded && (
+        <div style={{ padding: '0 1rem 0.85rem' }}>
           {previewing && (
             <video
               src={`/api/videos/${video.id}/stream`}
-              controls
-              autoPlay
-              style={{ width: '100%', maxWidth: 300, borderRadius: 6, marginBottom: '0.65rem' }}
+              controls autoPlay
+              style={{ width: '100%', height: 230, objectFit: 'contain', borderRadius: 8, marginBottom: '0.65rem', background: '#000' }}
             />
           )}
-
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button
-              onClick={handleUpload}
+              onClick={e => { e.stopPropagation(); handleUpload() }}
               disabled={uploading}
               style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.68rem',
-                fontWeight: 500,
-                letterSpacing: '0.04em',
-                padding: '0.3rem 0.85rem',
-                borderRadius: 6,
-                border: '1px solid rgba(110,231,183,0.25)',
-                background: 'rgba(110,231,183,0.08)',
-                color: 'var(--emerald)',
-                cursor: uploading ? 'default' : 'pointer',
-                textTransform: 'uppercase',
-                opacity: uploading ? 0.5 : 1,
-                transition: 'opacity 0.15s',
+                fontFamily: 'var(--font-mono)', fontSize: '0.68rem', fontWeight: 500,
+                letterSpacing: '0.04em', padding: '0.3rem 0.85rem', borderRadius: 6,
+                border: '1px solid rgba(110,231,183,0.25)', background: 'rgba(110,231,183,0.08)',
+                color: 'var(--emerald)', cursor: uploading ? 'default' : 'pointer',
+                textTransform: 'uppercase', opacity: uploading ? 0.5 : 1, transition: 'opacity 0.15s',
               }}
-            >
-              {uploading ? 'Starting…' : 'Upload Now'}
-            </button>
+            >{uploading ? 'Starting…' : 'Upload Now'}</button>
             <button
-              onClick={handleDequeue}
+              onClick={e => { e.stopPropagation(); handleDequeue() }}
               disabled={dequeuing}
               style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.68rem',
-                fontWeight: 500,
-                letterSpacing: '0.04em',
-                padding: '0.3rem 0.85rem',
-                borderRadius: 6,
-                border: '1px solid rgba(252,165,165,0.25)',
-                background: 'rgba(252,165,165,0.08)',
-                color: 'var(--rose)',
-                cursor: dequeuing ? 'default' : 'pointer',
-                textTransform: 'uppercase',
-                opacity: dequeuing ? 0.5 : 1,
-                transition: 'opacity 0.15s',
+                fontFamily: 'var(--font-mono)', fontSize: '0.68rem', fontWeight: 500,
+                letterSpacing: '0.04em', padding: '0.3rem 0.85rem', borderRadius: 6,
+                border: '1px solid rgba(252,165,165,0.25)', background: 'rgba(252,165,165,0.08)',
+                color: 'var(--rose)', cursor: dequeuing ? 'default' : 'pointer',
+                textTransform: 'uppercase', opacity: dequeuing ? 0.5 : 1, transition: 'opacity 0.15s',
               }}
-            >
-              {dequeuing ? '…' : 'Back to Review'}
-            </button>
+            >{dequeuing ? '…' : 'Back to Review'}</button>
             <button
-              onClick={() => setPreviewing(v => !v)}
+              onClick={e => { e.stopPropagation(); setPreviewing(v => !v) }}
               style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.68rem',
-                fontWeight: 500,
-                letterSpacing: '0.04em',
-                padding: '0.3rem 0.85rem',
-                borderRadius: 6,
-                border: '1px solid rgba(255,255,255,0.10)',
-                background: 'rgba(255,255,255,0.04)',
-                color: 'var(--text-muted)',
-                cursor: 'pointer',
-                textTransform: 'uppercase',
+                fontFamily: 'var(--font-mono)', fontSize: '0.68rem', fontWeight: 500,
+                letterSpacing: '0.04em', padding: '0.3rem 0.85rem', borderRadius: 6,
+                border: previewing ? '1px solid rgba(139,92,246,0.3)' : '1px solid rgba(255,255,255,0.10)',
+                background: previewing ? 'rgba(139,92,246,0.1)' : 'rgba(255,255,255,0.04)',
+                color: previewing ? 'var(--violet-light)' : 'var(--text-muted)',
+                cursor: 'pointer', textTransform: 'uppercase',
               }}
-            >
-              {previewing ? 'Hide' : 'Preview'}
-            </button>
+            >{previewing ? 'Hide' : 'Preview'}</button>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
