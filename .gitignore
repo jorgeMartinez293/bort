@@ -12,3 +12,4 @@ dist/
 .worktrees/
 docs/superpowers/
 dashboard/README.md
+tests/
