@@ -78,5 +78,5 @@ cp .env.example .env
 ```bash
 docker compose docker-compose.yml -f docker-compose.prod.yml -f 
 ```
-
-[!IMPORTANT]Podrás acceder al dashboard a través de http://localhost (o el puerto configurado en tu .env) 
+> [!IMPORTANT]
+> Accede al dashboard a mediante localhost
