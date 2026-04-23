@@ -60,3 +60,23 @@ Antes de comenzar, asegúrate de tener instalado:
 - **Credenciales de YouTube API** (archivo `client_secrets.json`)
 
 ---
+
+## ⚙️ Configuración e Instalación
+
+### 1. Clonar el repositorio
+```bash
+git clone [https://github.com/jorgeMartinez293/bort.git](https://github.com/jorgeMartinez293/bort.git)
+cd bort
+```
+### 2. Variables de entorno
+(modifica el archivo con tus claves)
+```bash
+cp .env.example .env
+```
+
+### 3. Despliegue de Docker
+```bash
+docker compose docker-compose.yml -f docker-compose.prod.yml -f 
+```
+
+[!IMPORTANT]Podrás acceder al dashboard a través de http://localhost (o el puerto configurado en tu .env) 
