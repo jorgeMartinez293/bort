@@ -11,3 +11,4 @@ dist/
 *.db
 .worktrees/
 docs/superpowers/
+dashboard/README.md

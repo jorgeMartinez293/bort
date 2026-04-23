@@ -25,7 +25,7 @@
 A continuación se muestra la interfaz principal desde donde se gestionan los videos y se monitorizan las tareas de subida:
 
 <div align="center">
-  <img src="https://via.placeholder.com/800x450.png?text=Inserta+aqui+la+captura+de+tu+dashboard" alt="Bort Dashboard Preview" style="border-radius: 10px; border: 1px solid #ddd;">
+  <img src="./example.png" alt="Bort Dashboard Preview" style="border-radius: 10px; border: 1px solid #ddd;">
   <p><em>Vista centralizada del estado de los videos y colas de procesamiento.</em></p>
 </div>
 
